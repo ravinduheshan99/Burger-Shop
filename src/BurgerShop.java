@@ -590,6 +590,7 @@ class BurgerShop {
                             System.out.print("\nEnter your quantity update value : ");
                             int value = input6.nextInt();
                             ord[i].setOrderQty(value);
+                            ord[i].setOrderValue(value*BURGERPRICE);
                             System.out.println("\n\t***Update order quantity successfully***");
                             System.out.println("\nnew order quantity - " + ord[i].getOrderQty());
                             System.out.printf("new order value - %.2f", (ord[i].getOrderQty() * BURGERPRICE));
@@ -706,10 +707,11 @@ class BurgerShop {
                             continue L10;
                         }
                     }
-                } else {
-                    System.out.println("\n***Please Enter a Valid OrderId***");
-                    continue L9;
                 }
+            }
+            if(!orderFound2){
+                System.out.println("\n***Please Enter a Valid OrderId***");
+                continue L9;
             }
         }
     }
