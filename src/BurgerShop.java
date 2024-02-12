@@ -1,251 +1,287 @@
-import com.sun.source.tree.WhileLoopTree;
-
 import java.util.*;
 
 class ListCus {
+    //---------Inner Class---------
+    class Node {
+        private customer data;
+        private Node next;
 
-    private int nextIndex;
-    private customer[] dataArray;
-
-    ListCus(int size) {
-        nextIndex = 0;
-        dataArray = new customer[size];
+        Node(customer data) {
+            this.data = data;
+        }
     }
 
-    private boolean isFull() {
-        return nextIndex >= dataArray.length;
+    private Node first;
+
+    private boolean isEmpty() {
+        return first == null;
     }
 
-    public boolean isEmpty() {
-        return nextIndex <= 0;
+    public int size() {
+        int count = 0;
+        Node temp = first;
+        while (temp != null) {
+            count++;
+            temp = temp.next;
+        }
+        return count;
     }
 
     public void add(customer data) {
-        if (isFull()) {
-            extendsArray();
+        Node n1 = new Node(data);
+        if (isEmpty()) {
+            first = n1;
+        } else {
+            Node lastNode = first;
+            while (lastNode.next != null) {
+                lastNode = lastNode.next;
+            }
+            lastNode.next = n1;
         }
-        dataArray[nextIndex++] = data;
     }
 
     public void add(int index, customer data) {
-        if (index >= 0 && index <= nextIndex) {
-            if (isFull()) {
-                extendsArray();
+        Node n1 = new Node(data);
+        if (index >= 0 && index <= size()) {
+            if (index == 0) {
+                first = n1;
+            } else {
+                int count = 0;
+                Node temp = first;
+                while (count < index - 1) {
+                    temp = temp.next;
+                    count++;
+                }
+                n1.next = temp.next;
+                temp.next = n1;
             }
-            for (int i = nextIndex; i >= index; i--) {
-                dataArray[i] = dataArray[i - 1];
-            }
-            dataArray[index] = data;
-            nextIndex++;
         }
-    }
-
-    public void remove(int index) {
-        if (index >= 0 && index < nextIndex) {
-            for (int i = index; i < nextIndex - 1; i++) {
-                dataArray[i] = dataArray[i + 1];
-            }
-            nextIndex--;
-        }
-    }
-
-    private void extendsArray() {
-        customer[] tempDataArray = new customer[(int) (dataArray.length * 1.5)];
-        for (int i = 0; i < dataArray.length; i++) {
-            tempDataArray[i] = dataArray[i];
-        }
-        dataArray = tempDataArray;
     }
 
     public customer get(int index) {
-        if (index >= 0 && index < nextIndex) {
-            return dataArray[index];
-        } else {
-            return null;
-        }
-    }
-
-    public boolean contains(String data) {
-        for (int i = 0; i < nextIndex; i++) {
-            if (dataArray[i].getCustomerId() == data) {
-                return true;
+        if (index >= 0 && index < size()) {
+            int count = 0;
+            Node temp = first;
+            while (count < index) {
+                temp = temp.next;
+                count++;
             }
+            return temp.data;
         }
-        return false;
+        return null;
     }
 
-    public customer peek() {
-        if (isEmpty()) {
-            return null;
+    public int search(customer data) {
+        Node temp = first;
+        int index = 0;
+        while (temp != null) {
+            if (temp.data == data) {
+                return index;
+            }
+            index++;
+            temp = temp.next;
         }
-        return dataArray[0];
+        return -1;
     }
 
-    public customer poll() {
-        if (isEmpty()) {
-            return null;
-        } else {
-            customer frontData = dataArray[0];
-            remove(0);
-            return frontData;
-        }
+    public boolean contains(customer data) {
+        return search(data) != -1;
     }
 
     public void printList() {
-        System.out.println("[");
-        for (int i = 0; i < nextIndex; i++) {
-            System.out.println(dataArray[i] + ",");
+        Node temp = first;
+        System.out.print("[");
+        while (temp != null) {
+            System.out.println(temp.data + ", ");
+            temp = temp.next;
         }
-        System.out.println(isEmpty() ? "empty]" : "\b\b]");
+        System.out.println(first == null ? "empty]" : "\b\b]");
     }
 
     public customer[] toArray() {
-        customer[] temp = new customer[nextIndex];
-        for (int i = 0; i < temp.length; i++) {
-            temp[i] = dataArray[i];
+        customer[] tempArray = new customer[size()];
+        int i = 0;
+        Node temp = first;
+        while (temp != null) {
+            tempArray[i++] = temp.data;
+            temp = temp.next;
         }
-        return temp;
+        return tempArray;
     }
 
-    public int size() {
-        return nextIndex;
-    }
-
-    public void clear() {
-        nextIndex = 0;
-    }
-
-    public int getNextIndex() {
-        return nextIndex;
-    }
-
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
-    }
-}
-
-class ListOrd {
-
-    private int nextIndex;
-    private orders[] dataArray;
-
-    ListOrd(int size) {
-        nextIndex = 0;
-        dataArray = new orders[size];
-    }
-
-    private boolean isFull() {
-        return nextIndex >= dataArray.length;
-    }
-
-    public boolean isEmpty() {
-        return nextIndex <= 0;
-    }
-
-    public void add(orders data) {
-        if (isFull()) {
-            extendsArray();
-        }
-        dataArray[nextIndex++] = data;
-    }
-
-    public void add(int index, orders data) {
-        if (index >= 0 && index <= nextIndex) {
-            if (isFull()) {
-                extendsArray();
-            }
-            for (int i = nextIndex; i >= index; i--) {
-                dataArray[i] = dataArray[i - 1];
-            }
-            dataArray[index] = data;
-            nextIndex++;
+    //Removing the first element
+    public void remove() {
+        if (first != null) {
+            first = first.next;
         }
     }
 
     public void remove(int index) {
-        if (index >= 0 && index < nextIndex) {
-            for (int i = index; i < nextIndex - 1; i++) {
-                dataArray[i] = dataArray[i + 1];
+        if (index >= 0 && index < size()) {
+            Node temp = first;
+            int count = 0;
+            while (count < index - 1) {
+                temp = temp.next;
+                count++;
             }
-            nextIndex--;
+            Node temp2 = temp.next;
+            temp = temp2.next;
         }
-    }
-
-    private void extendsArray() {
-        orders[] tempDataArray = new orders[(int) (dataArray.length * 1.5)];
-        for (int i = 0; i < dataArray.length; i++) {
-            tempDataArray[i] = dataArray[i];
-        }
-        dataArray = tempDataArray;
-    }
-
-    public orders get(int index) {
-        if (index >= 0 && index < nextIndex) {
-            return dataArray[index];
-        } else {
-            return null;
-        }
-    }
-
-    public boolean contains(String data) {
-        for (int i = 0; i < nextIndex; i++) {
-            if (dataArray[i].getOrderId() == data) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public orders peek() {
-        if (isEmpty()) {
-            return null;
-        }
-        return dataArray[0];
-    }
-
-    public orders poll() {
-        if (isEmpty()) {
-            return null;
-        } else {
-            orders frontData = dataArray[0];
-            remove(0);
-            return frontData;
-        }
-    }
-
-    public void printList() {
-        System.out.println("[");
-        for (int i = 0; i < nextIndex; i++) {
-            System.out.println(dataArray[i] + ",");
-        }
-        System.out.println(isEmpty() ? "empty]" : "\b\b]");
-    }
-
-    public orders[] toArray() {
-        orders[] temp = new orders[nextIndex];
-        for (int i = 0; i < temp.length; i++) {
-            temp[i] = dataArray[i];
-        }
-        return temp;
-    }
-
-    public int size() {
-        return nextIndex;
     }
 
     public void clear() {
-        nextIndex = 0;
+        first = null;
     }
 
-    public int getNextIndex() {
-        return nextIndex;
+    public Node getFirst() {
+        return first;
     }
 
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
+    public void setFirst(Node first) {
+        this.first = first;
     }
 }
+class ListOrd {
+    //---------Inner Class---------
+    class Node {
+        private orders data;
+        private Node next;
 
+        Node(orders data) {
+            this.data = data;
+        }
+    }
+
+    private Node first;
+
+    private boolean isEmpty() {
+        return first == null;
+    }
+
+    public int size() {
+        int count = 0;
+        Node temp = first;
+        while (temp != null) {
+            count++;
+            temp = temp.next;
+        }
+        return count;
+    }
+
+    public void add(orders data) {
+        Node n1 = new Node(data);
+        if (isEmpty()) {
+            first = n1;
+        } else {
+            Node lastNode = first;
+            while (lastNode.next != null) {
+                lastNode = lastNode.next;
+            }
+            lastNode.next = n1;
+        }
+    }
+
+    public void add(int index, orders data) {
+        Node n1 = new Node(data);
+        if (index >= 0 && index <= size()) {
+            if (index == 0) {
+                first = n1;
+            } else {
+                int count = 0;
+                Node temp = first;
+                while (count < index - 1) {
+                    temp = temp.next;
+                    count++;
+                }
+                n1.next = temp.next;
+                temp.next = n1;
+            }
+        }
+    }
+
+    public orders get(int index) {
+        if (index >= 0 && index < size()) {
+            int count = 0;
+            Node temp = first;
+            while (count < index) {
+                temp = temp.next;
+                count++;
+            }
+            return temp.data;
+        }
+        return null;
+    }
+
+    public int search(orders data) {
+        Node temp = first;
+        int index = 0;
+        while (temp != null) {
+            if (temp.data == data) {
+                return index;
+            }
+            index++;
+            temp = temp.next;
+        }
+        return -1;
+    }
+
+    public boolean contains(orders data) {
+        return search(data) != -1;
+    }
+
+    public void printList() {
+        Node temp = first;
+        System.out.print("[");
+        while (temp != null) {
+            System.out.println(temp.data + ", ");
+            temp = temp.next;
+        }
+        System.out.println(first == null ? "empty]" : "\b\b]");
+    }
+
+    public orders[] toArray() {
+        orders[] tempArray = new orders[size()];
+        int i = 0;
+        Node temp = first;
+        while (temp != null) {
+            tempArray[i++] = temp.data;
+            temp = temp.next;
+        }
+        return tempArray;
+    }
+
+    //Removing the first element
+    public void remove() {
+        if (first != null) {
+            first = first.next;
+        }
+    }
+
+    public void remove(int index) {
+        if (index >= 0 && index < size()) {
+            Node temp = first;
+            int count = 0;
+            while (count < index - 1) {
+                temp = temp.next;
+                count++;
+            }
+            Node temp2 = temp.next;
+            temp = temp2.next;
+        }
+    }
+
+    public void clear() {
+        first = null;
+    }
+
+    public Node getFirst() {
+        return first;
+    }
+
+    public void setFirst(Node first) {
+        this.first = first;
+    }
+}
 class customer {
     private String customerId;
     private String customerName;
@@ -290,7 +326,6 @@ class customer {
         this.total = total;
     }
 }
-
 class orders {
     private String orderId;
     private int orderStatus;
@@ -302,6 +337,10 @@ class orders {
         this.orderStatus = orderStatus;
         this.orderQty = orderQty;
         this.orderValue = orderValue;
+    }
+
+    public orders() {
+
     }
 
     public String getOrderId() {
@@ -337,22 +376,20 @@ class orders {
     }
 }
 
-class BurgerShop {
+class Controller {
+    public static ListCus dbcus = new ListCus();
+    public static ListOrd dbord = new ListOrd();
 
     final static double BURGERPRICE = 500;
-    public static ListCus cus = new ListCus(10);
-    public static ListOrd ord = new ListOrd(10);
-
     public static final int PREPARING = 0;
     public static final int DELIVERED = 1;
     public static final int CANCEL = 2;
 
-
     public static String generateOrderId() {
-        if (cus.size() == 0) {
+        if (dbcus.size() == 0) {
             return "B0001";
         }
-        String lastOrderId = ord.get(ord.getNextIndex() - 1).getOrderId();
+        String lastOrderId = dbord.get(dbord.size() - 1).getOrderId();
         int number = Integer.parseInt(lastOrderId.split("B")[1]);
         number++;
         return String.format("B%04d", number);
@@ -404,11 +441,11 @@ class BurgerShop {
             }
             boolean isExistCustomer = false;
             String cusName = "";
-            for (int i = 0; i < cus.getNextIndex(); i++) {
-                if (cusId.equals(cus.get(i).getCustomerId())) {
+            for (int i = 0; i < dbcus.size(); i++) {
+                if (cusId.equals(dbcus.get(i).getCustomerId())) {
                     isExistCustomer = true;
-                    System.out.println("Enter Customer Name: " + cus.get(i).getCustomerName());
-                    cusName = cus.get(i).getCustomerName();
+                    System.out.println("Enter Customer Name: " + dbcus.get(i).getCustomerName());
+                    cusName = dbcus.get(i).getCustomerName();
                     break;
                 }
             }
@@ -433,8 +470,8 @@ class BurgerShop {
                         System.out.print("\tDo you want to place this order?(Y/N) : ");
                         char res1 = input2.next().toUpperCase().charAt(0);
                         if (res1 == 'Y') {
-                            cus.add(new customer(cusId, cusName));
-                            ord.add(new orders(orderId, 0, qty, (qty * BURGERPRICE)));
+                            dbcus.add(new customer(cusId, cusName));
+                            dbord.add(new orders(orderId, 0, qty, (qty * BURGERPRICE)));
                             System.out.println("Your Order is Enter to the System Successfully");
                             System.out.println("");
                             L3:
@@ -465,7 +502,6 @@ class BurgerShop {
             }
         } while (true);
     }
-
 
     public static void bestCustomer() {
         L20:
@@ -498,13 +534,13 @@ class BurgerShop {
 
     public static customer[] removeDuplicates() {
         customer[] idArrayDupRemoved = new customer[0];
-        for (int i = 0; i < cus.getNextIndex(); i++) {
-            if (!(search(cus.get(i).getCustomerId(), idArrayDupRemoved))) {
+        for (int i = 0; i < dbcus.size(); i++) {
+            if (!(search(dbcus.get(i).getCustomerId(), idArrayDupRemoved))) {
                 customer[] tempIdArray = new customer[idArrayDupRemoved.length + 1];
                 for (int j = 0; j < idArrayDupRemoved.length; j++) {
                     tempIdArray[j] = new customer(idArrayDupRemoved[j].getCustomerId(), idArrayDupRemoved[j].getCustomerName());
                 }
-                tempIdArray[tempIdArray.length - 1] = new customer(cus.get(i).getCustomerId(), cus.get(i).getCustomerName());
+                tempIdArray[tempIdArray.length - 1] = new customer(dbcus.get(i).getCustomerId(), dbcus.get(i).getCustomerName());
                 idArrayDupRemoved = tempIdArray;
             }
         }
@@ -514,9 +550,9 @@ class BurgerShop {
     public static void calculateTotalOrderValues(customer[] idArrayDupRemoved) {
         for (int k = 0; k < idArrayDupRemoved.length; k++) {
             int total = 0;
-            for (int m = 0; m < cus.getNextIndex(); m++) {
-                if (idArrayDupRemoved[k].getCustomerId().equals(cus.get(m).getCustomerId())) {
-                    total += ord.get(m).getOrderValue();
+            for (int m = 0; m < dbcus.size(); m++) {
+                if (idArrayDupRemoved[k].getCustomerId().equals(dbcus.get(m).getCustomerId())) {
+                    total += dbord.get(m).getOrderValue();
                 }
             }
             idArrayDupRemoved[k].setTotal(total);
@@ -559,7 +595,6 @@ class BurgerShop {
         return false;
     }
 
-
     public static void searchOrder() {
         L6:
         while (true) {
@@ -570,12 +605,12 @@ class BurgerShop {
             System.out.print("Enter Order Id : ");
             String orderId = input3.next();
             boolean orderFound = false;
-            for (int i = 0; i < ord.getNextIndex(); i++) {
-                if (orderId.equals(ord.get(i).getOrderId())) {
+            for (int i = 0; i < dbord.size(); i++) {
+                if (orderId.equals(dbord.get(i).getOrderId())) {
                     System.out.println("_____________________________________________________________________________________");
                     System.out.println("OrderID\t\tCustomerID\t\t Name\t\tQuantity\t\tOrderValue\t\tOrderStatus |");
                     System.out.println("_____________________________________________________________________________________");
-                    System.out.println(ord.get(i).getOrderId() + "\t\t" + cus.get(i).getCustomerId() + "\t\t" + cus.get(i).getCustomerName() + "\t\t\t\t" + ord.get(i).getOrderQty() + "\t\t\t\t" + ord.get(i).getOrderValue() + "\t\t\t\t" + getStatusText(ord.get(i).getOrderStatus()) + "  |");
+                    System.out.println(dbord.get(i).getOrderId() + "\t\t" + dbcus.get(i).getCustomerId() + "\t\t" + dbcus.get(i).getCustomerName() + "\t\t\t\t" + dbord.get(i).getOrderQty() + "\t\t\t\t" + dbord.get(i).getOrderValue() + "\t\t\t\t" + getStatusText(dbord.get(i).getOrderStatus()) + "  |");
                     System.out.println("_____________________________________________________________________________________");
                     orderFound = true;
                     L7:
@@ -612,16 +647,16 @@ class BurgerShop {
             System.out.print("Enter Customer Id (Or Type 'exit' To Mainmenu) : ");
             String res5 = input4.nextLine();
             boolean customerFound = false;
-            for (int j = 0; j < cus.getNextIndex(); j++) {
-                if (res5.equals(cus.get(j).getCustomerId())) {
+            for (int j = 0; j < dbcus.size(); j++) {
+                if (res5.equals(dbcus.get(j).getCustomerId())) {
                     customerFound = true;
                 }
             }
             if (customerFound) {
-                for (int i = 0; i < cus.getNextIndex(); i++) {
-                    if (res5.equals(cus.get(i).getCustomerId())) {
-                        System.out.println("\nCustomerID - " + cus.get(i).getCustomerId());
-                        System.out.println("Name - " + cus.get(i).getCustomerName());
+                for (int i = 0; i < dbcus.size(); i++) {
+                    if (res5.equals(dbcus.get(i).getCustomerId())) {
+                        System.out.println("\nCustomerID - " + dbcus.get(i).getCustomerId());
+                        System.out.println("Name - " + dbcus.get(i).getCustomerName());
                         System.out.println("\nCustomer Order Details");
                         System.out.println("==========================");
                         System.out.println("\n");
@@ -629,9 +664,9 @@ class BurgerShop {
                         System.out.println("---------------------------------------------------------------------------------");
                         System.out.println("Order_ID\t\t\t\t\tOrder_Quantity\t\t\t\t\tTotal");
                         System.out.println("---------------------------------------------------------------------------------");
-                        for (int j = 0; j < cus.getNextIndex(); j++) {
-                            if (res5.equals(cus.get(j).getCustomerId())) {
-                                System.out.println(ord.get(j).getOrderId() + "\t\t\t\t\t\t\t" + ord.get(j).getOrderQty() + "\t\t\t\t\t\t\t" + (ord.get(j).getOrderQty() * BURGERPRICE));
+                        for (int j = 0; j < dbcus.size(); j++) {
+                            if (res5.equals(dbcus.get(j).getCustomerId())) {
+                                System.out.println(dbord.get(j).getOrderId() + "\t\t\t\t\t\t\t" + dbord.get(j).getOrderQty() + "\t\t\t\t\t\t\t" + (dbord.get(j).getOrderQty() * BURGERPRICE));
                             }
                         }
                         L9:
@@ -681,10 +716,10 @@ class BurgerShop {
                     System.out.println("");
                     System.out.println("______________________________________________________________________");
                     System.out.println("OrderID\t\tCustomerID\t\t Name\t\tQuantity\t\tOrderValue |");
-                    for (int i = 0; i < ord.getNextIndex(); i++) {
-                        if (ord.get(i).getOrderStatus() == 1) {
+                    for (int i = 0; i < dbord.size(); i++) {
+                        if (dbord.get(i).getOrderStatus() == 1) {
                             System.out.println("______________________________________________________________________");
-                            System.out.println(ord.get(i).getOrderId() + "\t\t" + cus.get(i).getCustomerId() + "\t\t" + cus.get(i).getCustomerName() + "\t\t\t" + ord.get(i).getOrderQty() + "\t\t\t " + (ord.get(i).getOrderQty() * BURGERPRICE) + "  |");
+                            System.out.println(dbord.get(i).getOrderId() + "\t\t" + dbcus.get(i).getCustomerId() + "\t\t" + dbcus.get(i).getCustomerName() + "\t\t\t" + dbord.get(i).getOrderQty() + "\t\t\t " + (dbord.get(i).getOrderQty() * BURGERPRICE) + "  |");
                         } else {
                             continue;
                         }
@@ -712,10 +747,10 @@ class BurgerShop {
                     System.out.println("");
                     System.out.println("______________________________________________________________________");
                     System.out.println("OrderID\t\tCustomerID\t\t Name\t\tQuantity\t\tOrderValue |");
-                    for (int i = 0; i < ord.getNextIndex(); i++) {
-                        if (ord.get(i).getOrderStatus() == 0) {
+                    for (int i = 0; i < dbord.size(); i++) {
+                        if (dbord.get(i).getOrderStatus() == 0) {
                             System.out.println("______________________________________________________________________");
-                            System.out.println(ord.get(i).getOrderId() + "\t\t" + cus.get(i).getCustomerId() + "\t\t" + cus.get(i).getCustomerName() + "\t\t\t" + ord.get(i).getOrderQty() + "\t\t\t " + (ord.get(i).getOrderQty() * BURGERPRICE) + "  |");
+                            System.out.println(dbord.get(i).getOrderId() + "\t\t" + dbcus.get(i).getCustomerId() + "\t\t" + dbcus.get(i).getCustomerName() + "\t\t\t" + dbord.get(i).getOrderQty() + "\t\t\t " + (dbord.get(i).getOrderQty() * BURGERPRICE) + "  |");
                         } else {
                             continue;
                         }
@@ -742,10 +777,10 @@ class BurgerShop {
                     System.out.println("");
                     System.out.println("______________________________________________________________________");
                     System.out.println("OrderID\t\tCustomerID\t\t Name\t\tQuantity\t\tOrderValue |");
-                    for (int i = 0; i < ord.getNextIndex(); i++) {
-                        if (ord.get(i).getOrderStatus() == 2) {
+                    for (int i = 0; i < dbord.size(); i++) {
+                        if (dbord.get(i).getOrderStatus() == 2) {
                             System.out.println("______________________________________________________________________");
-                            System.out.println(ord.get(i).getOrderId() + "\t\t" + cus.get(i).getCustomerId() + "\t\t" + cus.get(i).getCustomerName() + "\t\t\t" + ord.get(i).getOrderQty() + "\t\t\t " + (ord.get(i).getOrderQty() * BURGERPRICE) + "  |");
+                            System.out.println(dbord.get(i).getOrderId() + "\t\t" + dbcus.get(i).getCustomerId() + "\t\t" + dbcus.get(i).getCustomerName() + "\t\t\t" + dbord.get(i).getOrderQty() + "\t\t\t " + (dbord.get(i).getOrderQty() * BURGERPRICE) + "  |");
                         } else {
                             continue;
                         }
@@ -788,14 +823,14 @@ class BurgerShop {
 
             boolean orderFound2 = false;
 
-            for (int i = 0; i < ord.getNextIndex(); i++) {
-                if (oid2.equals(ord.get(i).getOrderId())) {
-                    System.out.println("\nOrderID     - " + ord.get(i).getOrderId());
-                    System.out.println("CustomerID  - " + cus.get(i).getCustomerId());
-                    System.out.println("Name        - " + cus.get(i).getCustomerName());
-                    System.out.println("Quantity    - " + ord.get(i).getOrderQty());
-                    System.out.println("OrderValue  - " + (ord.get(i).getOrderQty() * BURGERPRICE));
-                    System.out.println("OrderStatus - " + getStatusText(ord.get(i).getOrderStatus()));
+            for (int i = 0; i < dbord.size(); i++) {
+                if (oid2.equals(dbord.get(i).getOrderId())) {
+                    System.out.println("\nOrderID     - " + dbord.get(i).getOrderId());
+                    System.out.println("CustomerID  - " + dbcus.get(i).getCustomerId());
+                    System.out.println("Name        - " + dbcus.get(i).getCustomerName());
+                    System.out.println("Quantity    - " + dbord.get(i).getOrderQty());
+                    System.out.println("OrderValue  - " + (dbord.get(i).getOrderQty() * BURGERPRICE));
+                    System.out.println("OrderStatus - " + getStatusText(dbord.get(i).getOrderStatus()));
                     orderFound2 = true;
 
                     L10:
@@ -812,17 +847,17 @@ class BurgerShop {
                             System.out.println("");
                             System.out.println("Quantity Update");
                             System.out.println("===============");
-                            System.out.println("\nOrderID     - " + ord.get(i).getOrderId());
-                            System.out.println("CustomerID  - " + cus.get(i).getCustomerId());
-                            System.out.println("Name        - " + cus.get(i).getCustomerName());
+                            System.out.println("\nOrderID     - " + dbord.get(i).getOrderId());
+                            System.out.println("CustomerID  - " + dbcus.get(i).getCustomerId());
+                            System.out.println("Name        - " + dbcus.get(i).getCustomerName());
 
                             System.out.print("\nEnter your quantity update value : ");
                             int value = input6.nextInt();
-                            ord.get(i).setOrderQty(value);
-                            ord.get(i).setOrderValue(value * BURGERPRICE);
+                            dbord.get(i).setOrderQty(value);
+                            dbord.get(i).setOrderValue(value * BURGERPRICE);
                             System.out.println("\n\t***Update order quantity successfully***");
-                            System.out.println("\nnew order quantity - " + ord.get(i).getOrderQty());
-                            System.out.printf("new order value - %.2f", (ord.get(i).getOrderQty() * BURGERPRICE));
+                            System.out.println("\nnew order quantity - " + dbord.get(i).getOrderQty());
+                            System.out.printf("new order value - %.2f", (dbord.get(i).getOrderQty() * BURGERPRICE));
 
                             L11:
                             while (true) {
@@ -842,14 +877,14 @@ class BurgerShop {
                             System.out.println("");
                             System.out.println("Status Update");
                             System.out.println("===============");
-                            System.out.println("\nOrderID     - " + ord.get(i).getOrderId());
-                            System.out.println("CustomerID  - " + cus.get(i).getCustomerId());
-                            System.out.println("Name        - " + cus.get(i).getCustomerName());
+                            System.out.println("\nOrderID     - " + dbord.get(i).getOrderId());
+                            System.out.println("CustomerID  - " + dbcus.get(i).getCustomerId());
+                            System.out.println("Name        - " + dbcus.get(i).getCustomerName());
 
                             Scanner input5 = new Scanner(System.in);
                             L12:
                             while (true) {
-                                if (ord.get(i).getOrderStatus() == 0) {
+                                if (dbord.get(i).getOrderStatus() == 0) {
 
                                     L15:
                                     while (true) {
@@ -859,9 +894,9 @@ class BurgerShop {
                                         int value2 = input5.nextInt();
 
                                         if (value2 == 1) {
-                                            ord.get(i).setOrderStatus(value2);
+                                            dbord.get(i).setOrderStatus(value2);
                                             System.out.println("\n\tUpdate order status successfully");
-                                            System.out.println("\nnew order status - " + getStatusText(ord.get(i).getOrderStatus()));
+                                            System.out.println("\nnew order status - " + getStatusText(dbord.get(i).getOrderStatus()));
                                             L13:
                                             while (true) {
                                                 System.out.print("\n\nDo you want to update another order detail? (Y/N) : ");
@@ -876,9 +911,9 @@ class BurgerShop {
                                                 }
                                             }
                                         } else if (value2 == 2) {
-                                            ord.get(i).setOrderStatus(value2);
+                                            dbord.get(i).setOrderStatus(value2);
                                             System.out.println("\n\t***Update order status successfully***");
-                                            System.out.println("\nnew order status - " + getStatusText(ord.get(i).getOrderStatus()));
+                                            System.out.println("\nnew order status - " + getStatusText(dbord.get(i).getOrderStatus()));
                                             L13:
                                             while (true) {
                                                 System.out.print("\n\nDo you want to update another order details (Y/N) : ");
@@ -898,7 +933,7 @@ class BurgerShop {
                                         }
                                     }
 
-                                } else if (ord.get(i).getOrderStatus() == 1) {
+                                } else if (dbord.get(i).getOrderStatus() == 1) {
                                     System.out.println("***Order Already Delivered.Cannot Edit The Status***");
                                     L14:
                                     while (true) {
@@ -950,8 +985,13 @@ class BurgerShop {
         System.out.println("\n\t\t***Thanks For Coming. Have a Nice Day***\n");
         System.exit(0);
     }
+}
 
-    public static void main(String args[]) {
+class View {
+    public static void run() {
+
+        Controller cntrl = new Controller();
+
         L1:
         do {
             System.out.println("_________________________________________________________________________________");
@@ -967,41 +1007,47 @@ class BurgerShop {
 
             switch (option1) {
                 case '1':
-                    clearConsole();
-                    placeOrder();
+                    cntrl.clearConsole();
+                    cntrl.placeOrder();
                     break;
 
                 case '2':
-                    clearConsole();
-                    bestCustomer();
+                    cntrl.clearConsole();
+                    cntrl.bestCustomer();
                     break;
 
                 case '3':
-                    clearConsole();
-                    searchOrder();
+                    cntrl.clearConsole();
+                    cntrl.searchOrder();
                     break;
 
                 case '4':
-                    clearConsole();
-                    searchCustomer();
+                    cntrl.clearConsole();
+                    cntrl.searchCustomer();
                     break;
 
                 case '5':
-                    clearConsole();
-                    viewOrders();
+                    cntrl.clearConsole();
+                    cntrl.viewOrders();
                     break;
 
                 case '6':
-                    clearConsole();
-                    updateOrderDetails();
+                    cntrl.clearConsole();
+                    cntrl.updateOrderDetails();
                     break;
 
                 case '7':
-                    clearConsole();
-                    exit();
+                    cntrl.clearConsole();
+                    cntrl.exit();
                     break;
             }
-            clearConsole();
+            cntrl.clearConsole();
         } while (true);
+    }
+}
+
+class BurgerShop {
+    public static void main(String args[]) {
+        View.run();
     }
 }
